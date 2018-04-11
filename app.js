@@ -7,7 +7,6 @@ var logger = require('morgan');
 // 连接数据库
 var mongoose = require('mongoose');
 mongoose.connect('mongodb://localhost:27017/fullstack');
-mongoose.connect('mongodb://localhost:27017/mall')
 mongoose.connection.on('connected', function () {
   console.log('MongoDB connected success')
 });
