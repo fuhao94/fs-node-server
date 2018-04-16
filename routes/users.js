@@ -37,7 +37,7 @@ router.post('/login', function (req, res, next) {
     username: req.body.username,
     password: req.body.password
   };
-  User.findOne(param, function (err, doc) {
+  User.findOne({username: req.body.username}, function (err, doc) {
     if (err) {
       res.json({
         status: 2000,
@@ -46,20 +46,78 @@ router.post('/login', function (req, res, next) {
       })
     } else {
       if (doc) {
-        res.cookie('userId', doc._id, {
-          path: '/',
-          maxAge: 1000 * 60 * 60
-        });
+        if (req.body.password == doc.password) {
+          res.cookie('userId', doc._id, {
+            path: '/',
+            maxAge: 1000 * 60 * 60
+          });
+          res.json({
+            status: 1000,
+            msg: {
+              username: doc.username,
+              userId: doc._id,
+              description: doc.description
+            },
+            result: '登录成功'
+          })
+        } else {
+          res.json({
+            status: 2000,
+            msg: '密码错误',
+            result: ''
+          })
+        }
+      } else {
         res.json({
-          status: 1000,
-          msg: {
-            username: doc.username
-          },
-          result: '登录成功'
+          status: 2000,
+          msg: '用户不存在',
+          result: ''
         })
       }
     }
   })
+});
+
+//登出
+router.post('/logout', function (req, res, next) {
+  res.cookie('userId', '', {
+    path: '/',
+    maxAge: -1
+  });
+  res.json({
+    status: 1000,
+    msg: '',
+    result: '登出成功'
+  })
+});
+
+//查询所有用户
+router.get('/userList', function (req, res, next) {
+  if (req.query.search_type == 'user') {
+    User.find({}, function (err, doc) {
+      if (err) {
+        res.json({
+          status: 2000,
+          msg: err,
+          result: 0
+        })
+      } else {
+        if (doc) {
+          res.json({
+            status: 1000,
+            msg: '查询成功',
+            result: doc
+          })
+        }
+      }
+    })
+  } else {
+    res.json({
+      status: 3000,
+      msg: '暂不支持文章查询',
+      result: '查询失败'
+    })
+  }
 });
 
 module.exports = router;

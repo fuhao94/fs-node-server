@@ -8,6 +8,7 @@ var UsersSchema = new mongoose.Schema({
   userId: String,
   username: String,
   password: String,
+  description: {type: String, default: '好好学习，天天向上'},
   meta: {
     createAt: {
       type: Date,
@@ -27,7 +28,6 @@ UsersSchema.pre('save', function (next) {
   } else {
     this.meta.updateAt = Date.now();
   }
-
   next();
 });
 
