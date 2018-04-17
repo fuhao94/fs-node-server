@@ -80,7 +80,7 @@ router.post('/getArticleList', function (req, res, next) {
       } else {
         res.json({
           status: 1000,
-          msg: '没有数据',
+          msg: '',
           result: '查询成功'
         })
       }
@@ -126,6 +126,29 @@ router.get('/getArticleDetail', function (req, res, next) {
           result: '查询成功'
         })
       }
+    }
+  })
+});
+
+router.post('/articleEdit', function (req, res, next) {
+  var params = {
+    article_title: req.body.article_title,
+    article_type: req.body.article_type,
+    article_content: req.body.article_content
+  };
+  Article.update({_id: req.body.article_id}, params, function (err, doc) {
+    if (err) {
+      res.json({
+        status: 2001,
+        msg: err,
+        result: '编辑失败'
+      })
+    } else {
+      res.json({
+        status: 1000,
+        msg: '',
+        result: '修改成功'
+      })
     }
   })
 });
