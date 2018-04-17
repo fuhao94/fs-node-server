@@ -9,6 +9,9 @@ var ArticleSchema = new mongoose.Schema({
   article_title: String,
   article_type: String,
   article_content: String,
+  article_count: {type: Number, default: 0},
+  comment: String,
+  replay: String,
   meta: {
     createAt: {
       type: Date,

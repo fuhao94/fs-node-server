@@ -55,6 +55,81 @@ router.get('/detail', function (req, res, next) {
   })
 });
 
+router.post('/getArticleList', function (req, res, next) {
+  var params = {
+    userId: req.headers.userid,
+    article_type: req.body.article_type
+  };
+  if (req.body.keyWords) {
+    params.article_title = req.body.keyWords
+  }
+  Article.find(params, function (err, doc) {
+    if (err) {
+      res.json({
+        status: 2000,
+        msg: err,
+        result: '查询失败'
+      })
+    } else {
+      if (doc.length > 0) {
+        res.json({
+          status: 1000,
+          msg: doc,
+          result: '查询成功'
+        })
+      } else {
+        res.json({
+          status: 1000,
+          msg: '没有数据',
+          result: '查询成功'
+        })
+      }
+    }
+  })
+});
+
+router.get('/getArticleDetail', function (req, res, next) {
+  var params = {
+    _id: req.query.article_id
+  };
+  Article.findOne(params, function (err, doc) {
+    if (err) {
+      res.json({
+        status: 2001,
+        msg: err,
+        result: '查询失败'
+      })
+    } else {
+      if (doc) {
+        doc.article_count += 1;
+        doc.save(function (err1, doc1) {
+          if (err1) {
+            res.json({
+              status: 2002,
+              msg: err1,
+              result: '查询失败'
+            })
+          } else {
+            if (doc1) {
+              res.json({
+                status: 1000,
+                msg: doc1,
+                result: '查询成功'
+              })
+            }
+          }
+        });
+      } else {
+        res.json({
+          status: 1000,
+          msg: '没有数据',
+          result: '查询成功'
+        })
+      }
+    }
+  })
+});
+
 module.exports = router;
 
 
