@@ -153,6 +153,24 @@ router.post('/articleEdit', function (req, res, next) {
   })
 });
 
+router.post('/delete', function (req, res, next) {
+  Article.remove({_id: req.body.article_id}, function (err, doc) {
+    if (err) {
+      res.json({
+        status: 2000,
+        msg: err,
+        result: '删除失败'
+      })
+    } else {
+      res.json({
+        status: 1000,
+        msg: '',
+        result: '删除成功'
+      })
+    }
+  })
+});
+
 module.exports = router;
 
 
