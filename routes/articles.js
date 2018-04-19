@@ -56,36 +56,47 @@ router.get('/detail', function (req, res, next) {
 });
 
 router.post('/getArticleList', function (req, res, next) {
+  var page = Number(req.body.page);
+  var pageSize = Number(req.body.pageSize);
+  // var sort = req.body.sort;
+  var skip = (page - 1) * pageSize;
   var params = {
-    userId: req.headers.userid,
-    article_type: req.body.article_type
+    userId: req.headers.userid
   };
-  if (req.body.keyWords) {
-    params.article_title = req.body.keyWords
-  }
-  Article.find(params, function (err, doc) {
-    if (err) {
-      res.json({
-        status: 2000,
-        msg: err,
-        result: '查询失败'
+  if (req.body.article_type) params.article_type = req.body.article_type;
+  if (req.body.keyWords) params.article_title = req.body.keyWords;
+
+  Article.count(params, function (err, count) {
+    if (!err) {
+      var articleModel = Article.find(params).skip(skip).limit(pageSize);
+      articleModel.sort({'meta.updateAt': 1});
+      articleModel.exec(function (err, doc) {
+        if (err) {
+          res.json({
+            status: 2000,
+            msg: err,
+            result: '查询失败'
+          })
+        } else {
+          if (doc.length > 0) {
+            res.json({
+              status: 1000,
+              msg: doc,
+              result: '查询成功',
+              total: count
+            })
+          } else {
+            res.json({
+              status: 1000,
+              msg: [],
+              result: '查询成功',
+              total: count
+            })
+          }
+        }
       })
-    } else {
-      if (doc.length > 0) {
-        res.json({
-          status: 1000,
-          msg: doc,
-          result: '查询成功'
-        })
-      } else {
-        res.json({
-          status: 1000,
-          msg: '',
-          result: '查询成功'
-        })
-      }
     }
-  })
+  });
 });
 
 router.get('/getArticleDetail', function (req, res, next) {
@@ -154,7 +165,7 @@ router.post('/articleEdit', function (req, res, next) {
 });
 
 router.post('/delete', function (req, res, next) {
-  Article.remove({_id: req.body.article_id}, function (err, doc) {
+  Article.deleteOne({_id: req.body.article_id}, function (err) {
     if (err) {
       res.json({
         status: 2000,

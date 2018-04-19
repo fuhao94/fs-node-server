@@ -4,19 +4,6 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-// 连接数据库
-var mongoose = require('mongoose');
-mongoose.connect('mongodb://root:950328@47.106.146.21:27017/blog');
-mongoose.connection.on('connected', function () {
-  console.log('MongoDB connected success')
-});
-mongoose.connection.on('error', function () {
-  console.log('MongoDB connected fail')
-});
-mongoose.connection.on('disconnected', function () {
-  console.log('MongoDB connected disconnected')
-});
-
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 var articlesRouter = require('./routes/articles');
@@ -33,14 +20,7 @@ app.use(express.urlencoded({extended: false}));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
-app.use('/art', articlesRouter);
 
-// catch 404 and forward to error handler
-app.use(function (req, res, next) {
-  next(createError(404));
-});
 
 app.use(function (req, res, next) {
   if (req.cookies.userId) {
@@ -61,6 +41,16 @@ app.use(function (req, res, next) {
     }
   }
 });
+
+app.use('/', indexRouter);
+app.use('/users', usersRouter);
+app.use('/art', articlesRouter);
+
+// catch 404 and forward to error handler
+app.use(function (req, res, next) {
+  next(createError(404));
+});
+
 
 // error handler
 app.use(function (err, req, res, next) {
