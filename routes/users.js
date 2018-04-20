@@ -1,6 +1,7 @@
 var express = require('express');
 var router = express.Router();
 var User = require('../models/user');
+var Article = require('../models/article');
 
 
 /* GET users listing. */
@@ -118,6 +119,35 @@ router.get('/userList', function (req, res, next) {
       result: '查询失败'
     })
   }
+});
+
+router.get('/getUserInfo', function (req, res, next) {
+  User.findOne({_id: req.query.userId}, function (err, doc) {
+    if (!err) {
+      Article.aggregate(
+          [
+            {$match: {'userId': req.query.userId}},
+            {$group: {_id: '$userId', count: {$sum: '$article_count'}}}
+          ]
+          , function (err1, doc1) {
+            if (err1) {
+              res.json({
+                state: 2000,
+                msg: err1,
+                result: 'fail'
+              });
+            } else {
+              doc._doc.count = doc1[0].count;
+              res.json({
+                state: 1000,
+                msg: doc,
+                result: 'success'
+              });
+            }
+          })
+    }
+  });
+
 });
 
 module.exports = router;
