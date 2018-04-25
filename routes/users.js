@@ -137,7 +137,11 @@ router.get('/getUserInfo', function (req, res, next) {
                 result: 'fail'
               });
             } else {
-              doc._doc.count = doc1[0].count;
+              if (doc1.length > 0) {
+                doc._doc.count = doc1[0].count;
+              } else {
+                doc._doc.count = 0;
+              }
               res.json({
                 state: 1000,
                 msg: doc,
@@ -145,9 +149,39 @@ router.get('/getUserInfo', function (req, res, next) {
               });
             }
           })
+    } else {
+      res.json({
+        status: 2000,
+        msg: err,
+        result: ''
+      })
     }
   });
+});
 
+router.get('/getColumnList', function (req, res, next) {
+  User.findOne({_id: req.query.userId}, {column: 1, _id: 0}, function (err, doc) {
+    if (!err) {
+      res.json({
+        status: 1000,
+        msg: '',
+        result: doc
+      })
+    }
+  })
+});
+
+router.post('/setColumnShow', function (req, res, next) {
+  var userId = req.body.userId, columnId = req.body.columnId, isShow = req.body.isShow;
+  User.update({'_id': userId, 'column._id': columnId}, {'column.$.isShow': isShow}, function (err, doc) {
+    if (!err) {
+      res.json({
+        status: 1000,
+        msg: '设置成功',
+        result: ''
+      })
+    }
+  })
 });
 
 module.exports = router;

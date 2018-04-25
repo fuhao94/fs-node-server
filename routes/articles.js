@@ -58,17 +58,20 @@ router.get('/detail', function (req, res, next) {
 router.post('/getArticleList', function (req, res, next) {
   var page = Number(req.body.page);
   var pageSize = Number(req.body.pageSize);
-  // var sort = req.body.sort;
   var skip = (page - 1) * pageSize;
-  var params = {
-    userId: req.headers.userid
-  };
-  if (req.body.article_type) params.article_type = req.body.article_type;
-  if (req.body.keyWords) params.article_title = req.body.keyWords;
+  var keyWords = req.body.keyWords; //从URL中传来的 keyword参数
+  var reg = new RegExp(keyWords, 'i'); //不区分大小写
 
-  Article.count(params, function (err, count) {
+  var _filter = {
+    userId: req.body.userId,
+    $or: [
+      {article_title: {$regex: reg}}
+    ]
+  };
+
+  Article.count(_filter, function (err, count) {
     if (!err) {
-      var articleModel = Article.find(params).skip(skip).limit(pageSize);
+      var articleModel = Article.find(_filter).skip(skip).limit(pageSize);
       articleModel.sort({'meta.updateAt': 1});
       articleModel.exec(function (err, doc) {
         if (err) {
@@ -78,22 +81,19 @@ router.post('/getArticleList', function (req, res, next) {
             result: '查询失败'
           })
         } else {
-          if (doc.length > 0) {
-            res.json({
-              status: 1000,
-              msg: doc,
-              result: '查询成功',
-              total: count
-            })
-          } else {
-            res.json({
-              status: 1000,
-              msg: [],
-              result: '查询成功',
-              total: count
-            })
-          }
+          res.json({
+            status: 1000,
+            msg: '查询成功',
+            result: doc,
+            total: count
+          })
         }
+      })
+    } else {
+      res.json({
+        status: 2000,
+        msg: err,
+        result: ''
       })
     }
   });

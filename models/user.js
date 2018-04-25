@@ -9,6 +9,37 @@ var UsersSchema = new mongoose.Schema({
   username: String,
   password: String,
   description: {type: String, default: '好好学习，天天向上'},
+  column: {
+    type: [
+      {
+        column_name: String,
+        column_type: String,
+        isShow: Boolean
+      }
+    ],
+    default: [
+      {
+        column_name: '个人信息',
+        column_type: '图文',
+        isShow: true
+      },
+      {
+        column_name: '文章搜索',
+        column_type: '搜索条',
+        isShow: true
+      },
+      {
+        column_name: '文章分类',
+        column_type: '列表',
+        isShow: true
+      },
+      {
+        column_name: '文章存档',
+        column_type: '列表',
+        isShow: true
+      }
+    ]
+  },
   meta: {
     createAt: {
       type: Date,
