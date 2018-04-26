@@ -184,4 +184,66 @@ router.post('/setColumnShow', function (req, res, next) {
   })
 });
 
+router.post('/addClassify', function (req, res, next) {
+  var type = req.body.type, _id = req.body.userId;
+  User.update({'_id': _id}, {
+    $push: {
+      classify: {
+        name: type
+      }
+    }
+  }, function (err, doc) {
+    if (!err) {
+      res.json({
+        status: 1000,
+        msg: '',
+        result: '分类添加成功'
+      })
+    } else {
+      res.json({
+        status: 2000,
+        msg: err.message,
+        result: '分类添加失败'
+      })
+    }
+  })
+});
+
+router.get('/getClassifyList', function (req, res, next) {
+  User.findOne({_id: req.query.userId}, {classify: 1, _id: 0}, function (err, doc) {
+    if (!err) {
+      res.json({
+        status: 1000,
+        msg: '',
+        result: doc.classify
+      })
+    } else {
+      res.json({
+        status: 2000,
+        msg: '',
+        result: ''
+      })
+    }
+  })
+});
+
+router.post('/classifyDelete', function (req, res, next) {
+  var classify_id = req.body.classify_id, userId = req.body.userId;
+  User.update({'_id': userId}, {$pull: {'classify': {'_id': classify_id}}}, function (err, doc) {
+    if (err) {
+      res.json({
+        status: 0,
+        msg: err,
+        result: '分类删除失败'
+      })
+    } else {
+      res.json({
+        status: 1000,
+        msg: '',
+        result: '分类删除成功'
+      })
+    }
+  })
+});
+
 module.exports = router;

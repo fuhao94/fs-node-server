@@ -40,6 +40,13 @@ var UsersSchema = new mongoose.Schema({
       }
     ]
   },
+  classify: [
+    {
+      name: String,
+      isShow: {type: Boolean, default: true},
+      art_count: {type: Number, default: 0}
+    }
+  ],
   meta: {
     createAt: {
       type: Date,

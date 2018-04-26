@@ -10,6 +10,7 @@ var ArticleSchema = new mongoose.Schema({
   article_type: String,
   article_content: String,
   article_count: {type: Number, default: 0},
+  article_classify: String,
   comment: String,
   replay: String,
   meta: {
